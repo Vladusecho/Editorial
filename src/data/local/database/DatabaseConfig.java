@@ -8,12 +8,14 @@ import java.util.Properties;
 public class DatabaseConfig {
     private final Properties properties = new Properties();
 
+    // Конструктор класса через заданные параметры в теле конструктора
     public DatabaseConfig(String url, String user, String password) {
         properties.setProperty("db.url", url);
         properties.setProperty("db.user", user);
         properties.setProperty("db.password", password);
     }
 
+    // Конструктор класса через конфиг database.properties
     public DatabaseConfig() {
         try (var stream = DatabaseConfig.class.getResourceAsStream("/database.properties")) {
             if (stream == null) {
@@ -28,6 +30,7 @@ public class DatabaseConfig {
         }
     }
 
+    // Геттеры
     public String getUrl() {
         return getRequired("db.url");
     }

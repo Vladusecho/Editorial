@@ -14,6 +14,7 @@ public class DatabaseConnectionFactory {
         this.config = config;
     }
 
+    // Метод используемый для установления соединение с базой данных из конфига
     public Connection openConnection() throws SQLException {
         return DriverManager.getConnection(
                 config.getUrl(),

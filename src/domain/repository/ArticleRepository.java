@@ -4,6 +4,7 @@ import domain.model.Article;
 
 import java.util.List;
 
+// Интерфейс для статей
 public interface ArticleRepository {
 
     void addArticle(Article article);

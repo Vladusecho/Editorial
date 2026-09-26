@@ -1,7 +1,8 @@
 package domain.model;
 
+// Класс статьи
 public class Article {
-
+    // Свойства
     private int id;
     private int authorId;
     private String title;
@@ -9,7 +10,7 @@ public class Article {
     private Status status;
     private String publishedAt;
 
-
+    // Конструктор класса
     public Article(int id, int authorId, String title, String content, Status status, String publishedAt) {
         this.id = id;
         this.authorId = authorId;
@@ -19,6 +20,7 @@ public class Article {
         this.publishedAt = publishedAt;
     }
 
+    // Геттеры
     public int getId() {
         return id;
     }
@@ -43,6 +45,7 @@ public class Article {
         return publishedAt;
     }
 
+    // Сеттеры
     public void setId(int id) {
         this.id = id;
     }
@@ -63,6 +66,7 @@ public class Article {
         this.publishedAt = publishedAt;
     }
 
+    // enum Status
     public enum Status {
         PENDING, MODERATING, REJECTED, PUBLISHED
     }

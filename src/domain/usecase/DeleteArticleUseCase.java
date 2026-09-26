@@ -14,7 +14,7 @@ public class DeleteArticleUseCase {
     }
 
     public void execute(int articleId) {
-        idValidator.validate(articleId, "Article ID");
-        articleRepository.deleteArticle(articleId);
+        idValidator.validate(articleId, "Article ID"); // Валидируем
+        articleRepository.deleteArticle(articleId); // Удаляем
     }
 }
