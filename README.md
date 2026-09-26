@@ -9,4 +9,15 @@
 
 
 
-Copy `.env.example` to `.env` and set the values for your machine or server.
+## .env example:
+``` .env
+POSTGRES_DB=editorial
+
+POSTGRES_USER=editorial_app
+
+POSTGRES_PASSWORD=editorial
+
+POSTGRES_PORT=5433
+```
+
+## Also edit database.properties to fit your .env file
