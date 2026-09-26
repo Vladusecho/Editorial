@@ -24,4 +24,6 @@ public interface View {
     String getUserInput(String prompt);
 
     int getMenuChoice();
+
+    void showStats();
 }
