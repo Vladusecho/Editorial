@@ -90,6 +90,8 @@ jobs:
             docker run -d \
               --name editorial-app \
               --restart unless-stopped \
+              --network host \
+              --env-file /home/karpx/editorial/.env \
               -p 6767:6767 \
               $IMAGE
             docker image prune -f
