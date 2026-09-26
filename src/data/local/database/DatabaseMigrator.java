@@ -10,10 +10,11 @@ public class DatabaseMigrator {
     }
 
     public void migrate() {
-        Flyway flyway = Flyway.configure().dataSource(databaseConfig.getUrl(), databaseConfig.getUser(), databaseConfig.getPassword())
-                .locations("classpath:db/migration")
-                .load();
+        Flyway flyway = Flyway.configure().dataSource(databaseConfig.getUrl(), databaseConfig.getUser(), databaseConfig.getPassword()) // Инициализация и передача данных конфига
+                .locations("classpath:db/migration") // Место с файлами миграции
+                .load(); // Сборка готового Flyway
 
+        // Выполнение всех миграций
         flyway.migrate();
     }
 }

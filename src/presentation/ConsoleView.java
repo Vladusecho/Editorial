@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 public class ConsoleView implements View {
+    // Константы - номера комманд
     private static final int SHOW_ARTICLES_COMMAND = 1;
     private static final int ADD_ARTICLE_COMMAND = 2;
     private static final int EDIT_ARTICLE_COMMAND = 3;
@@ -25,10 +26,11 @@ public class ConsoleView implements View {
     private static final int DELETE_USER_COMMAND = 11;
     private static final int GET_USER_BY_ID_COMMAND = 12;
     private static final int SHOW_USERS_COMMAND = 13;
+    private static final int SHOW_STATS = 14;
     private static final int EXIT_COMMAND = 0;
 
-    private List<Article> articles = new ArrayList<>();
 
+    // "Мозги" системы, сканер и сервис валидатора
     private Presenter presenter;
     private final Scanner scanner = new Scanner(System.in);
     private final InputValidationService inputValidationService;
@@ -42,15 +44,15 @@ public class ConsoleView implements View {
     }
 
     public void run() {
-        boolean isRunning = true;
+        boolean isRunning = true; // флаг
 
         while (isRunning) {
-            showStartOptions();
+            showStartOptions(); // Выводим стартовое UI-меню
 
             try {
-                int command = getMenuChoice();
+                int command = getMenuChoice(); // Получаем комманду
 
-                switch (command) {
+                switch (command) { // В зависимости от комманды выбираем опцию
                     case SHOW_ARTICLES_COMMAND -> showArticles();
                     case ADD_ARTICLE_COMMAND -> addArticle();
                     case EDIT_ARTICLE_COMMAND -> editArticle();
@@ -64,6 +66,7 @@ public class ConsoleView implements View {
                     case DELETE_USER_COMMAND -> deleteUser();
                     case GET_USER_BY_ID_COMMAND -> getUserById();
                     case SHOW_USERS_COMMAND -> showUsers();
+                    case SHOW_STATS -> showStats();
                     case EXIT_COMMAND -> {
                         showMessage("Exiting the application");
                         isRunning = false;
@@ -76,6 +79,7 @@ public class ConsoleView implements View {
         }
     }
 
+    // UI - Вывод статьи (1-ой)
     @Override
     public void showArticle(Article article) {
         if (article == null) {
@@ -91,6 +95,7 @@ public class ConsoleView implements View {
         System.out.println("Published at: " + article.getPublishedAt());
     }
 
+    // UI - Вывод пользователя (1-го)
     @Override
     public void showUser(User user) {
         if (user == null) {
@@ -104,6 +109,7 @@ public class ConsoleView implements View {
         System.out.println("Role: " + user.getRole());
     }
 
+    // UI - Добавления статьи по вводу из консоли
     private void addArticle() {
         int authorId = getValidatedIntInput("Enter author ID:", inputValidationService::validateAuthorId);
         String title = getValidatedInput("Enter title:", inputValidationService::validateArticleTitle);
@@ -115,17 +121,17 @@ public class ConsoleView implements View {
         }
 
         Article article = new Article(0, authorId, title, content, Article.Status.PENDING, publishedAt);
-        if (presenter.onAddArticle(article)) {
-            articles.add(article);
-        }
+        presenter.onAddArticle(article);
     }
 
+    // Метод удаления статьи по id
     private void deleteArticle() {
         int articleId = getPositiveIntInput("Enter article ID:", "Article ID");
 
         presenter.onDeleteArticle(articleId);
     }
 
+    // Метод редактирования статьи по id
     private void editArticle() {
         int articleId = getPositiveIntInput("Enter article ID:", "Article ID");
         String title = getValidatedInput("Enter new title:", inputValidationService::validateArticleTitle);
@@ -135,6 +141,7 @@ public class ConsoleView implements View {
         presenter.onEditArticle(articleId, title, content, status);
     }
 
+    // Метод получения статьи по id
     private void getArticleById() {
         int articleId = getPositiveIntInput("Enter article ID to find:", "Article ID");
 
@@ -143,6 +150,7 @@ public class ConsoleView implements View {
         showArticle(article);
     }
 
+    // Метод добавления пользователя
     private void addUser() {
         String username = getValidatedInput("Enter username:", inputValidationService::validateUsername);
         String email = getValidatedInput("Enter email:", inputValidationService::validateEmail);
@@ -153,6 +161,7 @@ public class ConsoleView implements View {
         presenter.onAddUser(user);
     }
 
+    // Метод редактирования пользователя по id
     private void editUser() {
         int userId = getPositiveIntInput("Enter user ID:", "User ID");
         String username = getValidatedInput("Enter new username:", inputValidationService::validateUsername);
@@ -163,12 +172,14 @@ public class ConsoleView implements View {
         presenter.onEditUser(userId, username, email, passwordHash, role);
     }
 
+    // Метод удаления пользователя по id
     private void deleteUser() {
         int userId = getPositiveIntInput("Enter user ID:", "User ID");
 
         presenter.onDeleteUser(userId);
     }
 
+    // Метод получения пользователя по id
     private void getUserById() {
         int userId = getPositiveIntInput("Enter user ID to find:", "User ID");
         User user = presenter.onGetUserById(userId);
@@ -176,6 +187,7 @@ public class ConsoleView implements View {
         showUser(user);
     }
 
+    // UI - стартовое меню
     @Override
     public void showStartOptions() {
         System.out.println("-------------------------");
@@ -192,10 +204,12 @@ public class ConsoleView implements View {
         System.out.println("11. Delete user");
         System.out.println("12. Get user by ID");
         System.out.println("13. Show all users");
+        System.out.println("14. Get stats");
         System.out.println("0. Exit");
         System.out.println("-------------------------");
     }
 
+    // UI - вывод статей
     @Override
     public void showArticles() {
         List<Article> showArticlesList = presenter.onGetArticles();
@@ -219,17 +233,20 @@ public class ConsoleView implements View {
         }
     }
 
+    // Метод вывода сообщения
     @Override
     public void showMessage(String message) {
         System.out.println();
         System.out.println(message);
     }
 
+    // Метод вывода ошибки
     @Override
     public void showError(String error) {
         System.out.println("Error: " + error);
     }
 
+    // Метод получения ввода
     @Override
     public String getUserInput(String prompt) {
         System.out.println(prompt);
@@ -238,11 +255,13 @@ public class ConsoleView implements View {
         return scanner.nextLine();
     }
 
+    // Метод для вывода строчки ввода комманды и соответственно получения команды
     @Override
     public int getMenuChoice() {
         return getIntInput("Enter command:");
     }
 
+    // Метод получения числа из консоли
     private int getIntInput(String prompt) {
         while (true) {
             String input = getUserInput(prompt).trim();
@@ -255,10 +274,12 @@ public class ConsoleView implements View {
         }
     }
 
+    // Метод получения положительного числа из консоли
     private int getPositiveIntInput(String prompt, String fieldName) {
         return getValidatedIntInput(prompt, value -> inputValidationService.validateId(value, fieldName));
     }
 
+    // Метод получения валидированного числа ввода из консоли
     private int getValidatedIntInput(String prompt, IntConsumer validator) {
         while (true) {
             int value = getIntInput(prompt);
@@ -271,6 +292,7 @@ public class ConsoleView implements View {
         }
     }
 
+    // Метод получения валидированного ввода из консоли
     private String getValidatedInput(String prompt, Consumer<String> validator) {
         while (true) {
             String input = getUserInput(prompt).trim();
@@ -283,6 +305,7 @@ public class ConsoleView implements View {
         }
     }
 
+    // Метод получения валидированного ввода статуса из консоли
     private Article.Status getStatusInput(String prompt) {
         while (true) {
             String input = getUserInput(prompt).trim().toUpperCase(Locale.ROOT);
@@ -295,6 +318,7 @@ public class ConsoleView implements View {
         }
     }
 
+    // Метод получения валидированного ввода роли из консоли
     private User.Role getRoleInput(String prompt) {
         while (true) {
             int num = 1;
@@ -313,4 +337,30 @@ public class ConsoleView implements View {
         }
     }
 
+    @Override
+    public void showStats() {
+        int userCount = presenter.onGetUsers().toArray().length;
+        int articleCount = 0;
+        int pendingCount = 0;
+        int publishedCount = 0;
+        int rejectedCount = 0;
+
+        List<Article> articleList = presenter.onGetArticles();
+
+        articleCount = articleList.toArray().length;
+
+        for (int i = 0; i < articleCount; i++) {
+            String statusName = articleList.get(i).getStatus().name();
+
+            if (statusName.equals("PENDING")) pendingCount++;
+            if (statusName.equals("PUBLISHED")) publishedCount++;
+            if (statusName.equals("REJECTED")) rejectedCount++;
+        }
+
+        System.out.println("User count: " + userCount);
+        System.out.println("Article count: " + articleCount);
+        System.out.println("Articles awaiting moderation: " + pendingCount);
+        System.out.println("Articles publised: " + publishedCount);
+        System.out.println("Articles rejected: " + rejectedCount);
+    }
 }

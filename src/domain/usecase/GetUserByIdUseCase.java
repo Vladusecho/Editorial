@@ -14,7 +14,7 @@ public class GetUserByIdUseCase {
     }
 
     public User execute(int userId) {
-        idValidator.validate(userId, "User ID");
-        return userRepository.getUserById(userId);
+        idValidator.validate(userId, "User ID"); // Валидируем id
+        return userRepository.getUserById(userId); // Вовращаем пользователя
     }
 }

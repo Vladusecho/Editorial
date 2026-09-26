@@ -1,12 +1,15 @@
 package domain.model;
 
+// класс Пользователя
 public class User {
+    // Свойства
     private int id;
     private String username;
     private String email;
     private String passwordHash;
     private Role role;
 
+    // Конструктор класса
     public User(int id, String username, String email, String passwordHash, Role role) {
         this.id = id;
         this.username = username;
@@ -15,6 +18,7 @@ public class User {
         this.role = role;
     }
 
+    // Геттеры
     public int getId() {
         return id;
     }
@@ -35,6 +39,7 @@ public class User {
         return role;
     }
 
+    // Сеттеры
     public void setId(int id) {
         this.id = id;
     }
@@ -55,7 +60,7 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-
+    // enum Role
     public enum Role {
         ADMIN, EDITOR, AUTHOR
     }

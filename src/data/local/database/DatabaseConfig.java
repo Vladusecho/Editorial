@@ -18,12 +18,14 @@ public class DatabaseConfig {
     private final String user;
     private final String password;
 
+    // Конструктор класса через заданные параметры в теле конструктора
     public DatabaseConfig(String url, String user, String password) {
         this.url = requireValue(url, URL_ENV, URL_PROPERTY);
         this.user = requireValue(user, USER_ENV, USER_PROPERTY);
         this.password = requireValue(password, PASSWORD_ENV, PASSWORD_PROPERTY);
     }
 
+    // Конструктор класса через конфиг database.properties
     public DatabaseConfig() {
         Properties properties = loadProperties();
         this.url = resolve(URL_ENV, URL_PROPERTY, properties);
@@ -31,6 +33,7 @@ public class DatabaseConfig {
         this.password = resolve(PASSWORD_ENV, PASSWORD_PROPERTY, properties);
     }
 
+    // Геттеры
     public String getUrl() {
         return url;
     }

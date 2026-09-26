@@ -17,23 +17,28 @@ import presentation.validation.InputValidationService;
 
 public class Application {
     public static void main(String[] args) {
+        // Подключение штук для БД
         DatabaseConfig config = new DatabaseConfig();
         DatabaseMigrator migrator = new DatabaseMigrator(config);
         DatabaseConnectionFactory connectionFactory = new DatabaseConnectionFactory(config);
+
+        // Репозитории для доступа к данным через JDBC
         ArticleRepository articleRepository = new JdbcArticleRepository(connectionFactory);
         UserRepository userRepository = new JdbcUserRepository(connectionFactory);
 
+        // Создание валидаторов
         ArticleValidator articleValidator = new ArticleValidator(userRepository);
         UserValidator userValidator = new UserValidator();
         IdValidator idValidator = new IdValidator();
-        InputValidationService inputValidationService = new InputValidationService(
-                idValidator,
+        InputValidationService inputValidationService = new InputValidationService( // Подключение валидаторов
+                idValidator, // в единый сервис inputValidationService
                 articleValidator,
                 userValidator
         );
 
-        ConsoleView view = new ConsoleView(inputValidationService);
-        Presenter presenter = new Presenter(
+        // UI
+        ConsoleView view = new ConsoleView(inputValidationService); // Ввод вывод текста в консоль
+        Presenter presenter = new Presenter( // Обработка текста
                 view,
                 new GetArticlesUseCase(articleRepository),
                 new AddArticleUseCase(articleRepository, articleValidator),
@@ -51,6 +56,7 @@ public class Application {
         );
         view.setPresenter(presenter);
 
+        // Запуск системы
         migrator.migrate();
         view.run();
     }

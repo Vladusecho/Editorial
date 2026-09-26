@@ -14,7 +14,7 @@ public class GetArticleByIdUseCase {
     }
 
     public Article execute(int articleId) {
-        idValidator.validate(articleId, "Article ID");
-        return articleRepository.getArticleById(articleId);
+        idValidator.validate(articleId, "Article ID"); // Валидируем id
+        return articleRepository.getArticleById(articleId); // возвращаем статью
     }
 }

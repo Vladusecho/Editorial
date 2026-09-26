@@ -14,7 +14,7 @@ public class AddArticleUseCase {
     }
 
     public void execute(Article article) {
-        articleValidator.validate(article);
-        repository.addArticle(article);
+        articleValidator.validate(article); // Валидируем
+        repository.addArticle(article); // Добавляем
     }
 }
