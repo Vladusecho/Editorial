@@ -190,6 +190,9 @@ class PresenterTest {
         public int getMenuChoice() {
             return 0;
         }
+
+        @Override
+        public void showStats() {}
     }
 
     private static final class StubAddArticleUseCase extends AddArticleUseCase {

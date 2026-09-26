@@ -26,7 +26,8 @@ public class ConsoleView implements View {
     private static final int DELETE_USER_COMMAND = 11;
     private static final int GET_USER_BY_ID_COMMAND = 12;
     private static final int SHOW_USERS_COMMAND = 13;
-    private static final int EXPORT_ARTICLES_TO_EXCEL = 14;
+    private static final int SHOW_STATS = 14;
+    private static final int EXPORT_ARTICLES_TO_EXCEL = 15;
     private static final int EXIT_COMMAND = 0;
 
     // Внутренне хранилище статей?
@@ -68,6 +69,7 @@ public class ConsoleView implements View {
                     case DELETE_USER_COMMAND -> deleteUser();
                     case GET_USER_BY_ID_COMMAND -> getUserById();
                     case SHOW_USERS_COMMAND -> showUsers();
+                    case SHOW_STATS -> showStats();
                     case EXIT_COMMAND -> {
                         showMessage("Exiting the application");
                         isRunning = false;
@@ -123,9 +125,7 @@ public class ConsoleView implements View {
         }
 
         Article article = new Article(0, authorId, title, content, Article.Status.PENDING, publishedAt);
-        if (presenter.onAddArticle(article)) {
-            articles.add(article);
-        }
+        presenter.onAddArticle(article);
     }
 
     // Метод удаления статьи по id
@@ -208,7 +208,8 @@ public class ConsoleView implements View {
         System.out.println("11. Delete user");
         System.out.println("12. Get user by ID");
         System.out.println("13. Show all users");
-        System.out.println("14. Export articles to Excel");
+        System.out.println("14. Get stats");
+        System.out.println("15. Export articles to Excel");
         System.out.println("0. Exit");
         System.out.println("-------------------------");
     }
@@ -344,6 +345,33 @@ public class ConsoleView implements View {
                 showError("Value out of bounds");
             }
         }
+    }
+
+    @Override
+    public void showStats() {
+        int userCount = presenter.onGetUsers().toArray().length;
+        int articleCount = 0;
+        int pendingCount = 0;
+        int publishedCount = 0;
+        int rejectedCount = 0;
+
+        List<Article> articleList = presenter.onGetArticles();
+
+        articleCount = articleList.toArray().length;
+
+        for (int i = 0; i < articleCount; i++) {
+            String statusName = articleList.get(i).getStatus().name();
+
+            if (statusName.equals("PENDING")) pendingCount++;
+            if (statusName.equals("PUBLISHED")) publishedCount++;
+            if (statusName.equals("REJECTED")) rejectedCount++;
+        }
+
+        System.out.println("User count: " + userCount);
+        System.out.println("Article count: " + articleCount);
+        System.out.println("Articles awaiting moderation: " + pendingCount);
+        System.out.println("Articles publised: " + publishedCount);
+        System.out.println("Articles rejected: " + rejectedCount);
     }
 
     private void exportArticles(){
