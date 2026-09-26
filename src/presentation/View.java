@@ -14,6 +14,8 @@ public interface View {
 
     void showUser(User user);
 
+    void showUsers();
+
     void showMessage(String message);
 
     void showError(String error);

@@ -7,18 +7,7 @@ import data.local.repository.JdbcArticleRepository;
 import data.local.repository.JdbcUserRepository;
 import domain.repository.ArticleRepository;
 import domain.repository.UserRepository;
-import domain.usecase.AddArticleUseCase;
-import domain.usecase.AddUserUseCase;
-import domain.usecase.DeleteArticleUseCase;
-import domain.usecase.DeleteUserUseCase;
-import domain.usecase.EditArticleUseCase;
-import domain.usecase.EditUserUseCase;
-import domain.usecase.FilterArticlesUseCase;
-import domain.usecase.GetArticleByIdUseCase;
-import domain.usecase.GetArticlesUseCase;
-import domain.usecase.GetUserByIdUseCase;
-import domain.usecase.SearchArticleUseCase;
-import domain.usecase.SortArticlesUseCase;
+import domain.usecase.*;
 import domain.validator.ArticleValidator;
 import domain.validator.IdValidator;
 import domain.validator.UserValidator;
@@ -46,7 +35,7 @@ public class Application {
         ConsoleView view = new ConsoleView(inputValidationService);
         Presenter presenter = new Presenter(
                 view,
-                new GetArticlesUseCase(),
+                new GetArticlesUseCase(articleRepository),
                 new AddArticleUseCase(articleRepository, articleValidator),
                 new EditArticleUseCase(articleRepository, articleValidator, idValidator),
                 new GetArticleByIdUseCase(articleRepository, idValidator),
@@ -57,7 +46,8 @@ public class Application {
                 new AddUserUseCase(userRepository, userValidator),
                 new EditUserUseCase(userRepository, userValidator, idValidator),
                 new DeleteUserUseCase(userRepository, idValidator),
-                new GetUserByIdUseCase(userRepository, idValidator)
+                new GetUserByIdUseCase(userRepository, idValidator),
+                new GetUsersUseCase(userRepository)
         );
         view.setPresenter(presenter);
 

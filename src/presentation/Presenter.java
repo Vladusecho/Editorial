@@ -4,6 +4,9 @@ import domain.model.Article;
 import domain.model.User;
 import domain.usecase.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Presenter {
     private final View view;
     private final GetArticlesUseCase getArticlesUseCase;
@@ -18,6 +21,7 @@ public class Presenter {
     private final EditUserUseCase editUserUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
     private final GetUserByIdUseCase getUserByIdUseCase;
+    private final GetUsersUseCase getUsersUseCase;
 
 
     public Presenter(
@@ -33,7 +37,8 @@ public class Presenter {
             AddUserUseCase addUserUseCase,
             EditUserUseCase editUserUseCase,
             DeleteUserUseCase deleteUserUseCase,
-            GetUserByIdUseCase getUserByIdUseCase
+            GetUserByIdUseCase getUserByIdUseCase,
+            GetUsersUseCase getUsersUseCase
 
     ) {
         this.view = view;
@@ -49,6 +54,7 @@ public class Presenter {
         this.editUserUseCase = editUserUseCase;
         this.deleteUserUseCase = deleteUserUseCase;
         this.getUserByIdUseCase = getUserByIdUseCase;
+        this.getUsersUseCase = getUsersUseCase;
     }
 
     public boolean onAddArticle(Article article) {
@@ -62,7 +68,14 @@ public class Presenter {
         }
     }
 
-    public void onGetArticles() {
+    public List<Article> onGetArticles() {
+        List<Article> returnArticles = new ArrayList<Article>();
+        try {
+            returnArticles = getArticlesUseCase.execute();
+        } catch (IllegalStateException e) {
+            view.showError(e.getMessage());
+        }
+        return returnArticles;
     }
 
     public void onDeleteArticle(int articleId) {
@@ -145,6 +158,15 @@ public class Presenter {
         }
 
         return returnUser;
+    }
+
+    public List<User> onGetUsers() {
+        try {
+            return getUsersUseCase.execute();
+        } catch (IllegalStateException e) {
+            view.showError(e.getMessage());
+            return List.of();
+        }
     }
 
 }

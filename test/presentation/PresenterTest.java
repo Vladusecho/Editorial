@@ -12,6 +12,7 @@ import domain.usecase.FilterArticlesUseCase;
 import domain.usecase.GetArticleByIdUseCase;
 import domain.usecase.GetArticlesUseCase;
 import domain.usecase.GetUserByIdUseCase;
+import domain.usecase.GetUsersUseCase;
 import domain.usecase.SearchArticleUseCase;
 import domain.usecase.SortArticlesUseCase;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ class PresenterTest {
     void setUp() {
         presenter = new Presenter(
                 view,
-                new GetArticlesUseCase(),
+                new GetArticlesUseCase(null),
                 addArticleUseCase,
                 new EditArticleUseCase(null, null, null),
                 getArticleByIdUseCase,
@@ -53,7 +54,8 @@ class PresenterTest {
                 addUserUseCase,
                 editUserUseCase,
                 deleteUserUseCase,
-                getUserByIdUseCase
+                getUserByIdUseCase,
+                new GetUsersUseCase(null)
         );
     }
 
@@ -163,6 +165,10 @@ class PresenterTest {
 
         @Override
         public void showUser(User user) {
+        }
+
+        @Override
+        public void showUsers() {
         }
 
         @Override

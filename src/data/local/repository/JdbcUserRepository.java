@@ -5,6 +5,8 @@ import domain.repository.UserRepository;
 import data.local.database.DatabaseConnectionFactory;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JdbcUserRepository implements UserRepository {
     private final DatabaseConnectionFactory connectionFactory;
@@ -139,5 +141,31 @@ public class JdbcUserRepository implements UserRepository {
         } catch (SQLException e) {
             throw new IllegalStateException("Couldn't check if user exists", e);
         }
+    }
+
+    @Override
+    public List<User> getUsers() {
+        String sql = """
+                SELECT * FROM users
+                """;
+
+        try (var connection = connectionFactory.openConnection();
+             var statement = connection.prepareStatement(sql)
+        ) {
+
+            try (var resSet = statement.executeQuery()) {
+                List<User> returnUsersList = new ArrayList<User>();
+
+                while (resSet.next()) {
+                    returnUsersList.add(getUserById(resSet.getInt("id")));
+                }
+
+                return returnUsersList;
+            }
+        }
+        catch (SQLException e) {
+            throw new IllegalStateException("Couldn't get usesr");
+        }
+
     }
 }

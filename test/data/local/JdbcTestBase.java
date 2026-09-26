@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public abstract class JdbcTestBase {
+public abstract class   JdbcTestBase {
     private static EmbeddedPostgres postgres;
 
     protected static DatabaseConnectionFactory connectionFactory;

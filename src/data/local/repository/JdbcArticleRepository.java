@@ -7,6 +7,7 @@ import domain.repository.ArticleRepository;
 
 import javax.xml.crypto.Data;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcArticleRepository implements ArticleRepository {
@@ -24,10 +25,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                         RETURNING id
                 """;
 
-        try (
-                var connection = connectionFactory.openConnection();
-                var statement = connection.prepareStatement(sql);
-        ) {
+        try (var connection = connectionFactory.openConnection(); var statement = connection.prepareStatement(sql);) {
             statement.setInt(1, article.getAuthorId());
             statement.setString(2, article.getStatus().name());
             statement.setString(3, article.getTitle());
@@ -50,9 +48,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                 DELETE FROM articles WHERE id = ?
                 """;
 
-        try (var connection = connectionFactory.openConnection();
-             var statement = connection.prepareStatement(sql);
-        ) {
+        try (var connection = connectionFactory.openConnection(); var statement = connection.prepareStatement(sql);) {
             statement.setInt(1, articleId);
 
             int affectedRows = statement.executeUpdate();
@@ -76,9 +72,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                 WHERE id = ?
                 """;
 
-        try (var connection = connectionFactory.openConnection();
-             var statement = connection.prepareStatement(sql);
-        ) {
+        try (var connection = connectionFactory.openConnection(); var statement = connection.prepareStatement(sql);) {
             statement.setString(1, article.getStatus().name());
             statement.setString(2, article.getTitle());
             statement.setString(3, article.getContent());
@@ -113,20 +107,13 @@ public class JdbcArticleRepository implements ArticleRepository {
                 WHERE article.id = ?;
                 """;
 
-        try (var connection = connectionFactory.openConnection();
-             var statement = connection.prepareStatement(sql);
-        ) {
+        try (var connection = connectionFactory.openConnection(); var statement = connection.prepareStatement(sql);) {
             statement.setInt(1, articleId);
 
             try (var result = statement.executeQuery()) {
                 if (!result.next()) throw new IllegalArgumentException("Couldn't find an article");
 
-                Article returnArticle = new Article(result.getInt("id"),
-                        result.getInt("author_id"),
-                        result.getString("title"),
-                        result.getString("content"),
-                        Article.Status.valueOf(result.getString("status_code")),
-                        result.getString("published_at"));
+                Article returnArticle = new Article(result.getInt("id"), result.getInt("author_id"), result.getString("title"), result.getString("content"), Article.Status.valueOf(result.getString("status_code")), result.getString("published_at"));
 
                 return returnArticle;
             }
@@ -139,7 +126,29 @@ public class JdbcArticleRepository implements ArticleRepository {
 
     @Override
     public List<Article> getArticles() {
-        return List.of();
+        String sql = """
+                SELECT * FROM articles;
+                """;
+
+        try (var connection = connectionFactory.openConnection();
+             var statement = connection.prepareStatement(sql);
+        ) {
+
+            try (var resSet = statement.executeQuery()) {
+                List<Article> returnArticles = new ArrayList<Article>();
+
+                while (resSet.next()) {
+                    returnArticles.add(getArticleById(resSet.getInt("id")));
+                }
+
+                return returnArticles;
+            }
+
+        }
+        catch (SQLException e) {
+            throw new IllegalStateException("Couldn't get articles", e);
+        }
+
     }
 
     @Override
