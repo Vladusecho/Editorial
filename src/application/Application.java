@@ -3,8 +3,10 @@ package application;
 import data.local.database.DatabaseConfig;
 import data.local.database.DatabaseConnectionFactory;
 import data.local.database.DatabaseMigrator;
+import data.local.exporter.PoiArticleExcelExporter;
 import data.local.repository.JdbcArticleRepository;
 import data.local.repository.JdbcUserRepository;
+import domain.repository.ArticleExporter;
 import domain.repository.ArticleRepository;
 import domain.repository.UserRepository;
 import domain.usecase.*;
@@ -25,6 +27,10 @@ public class Application {
         // Репозитории для доступа к данным через JDBC
         ArticleRepository articleRepository = new JdbcArticleRepository(connectionFactory);
         UserRepository userRepository = new JdbcUserRepository(connectionFactory);
+
+        // Экспортер для экспорта Статей в Excel формат
+        ArticleExporter articleExporter = new PoiArticleExcelExporter();
+        ExportArticlesToExcelUseCase exportUseCase = new ExportArticlesToExcelUseCase(articleRepository, articleExporter);
 
         // Создание валидаторов
         ArticleValidator articleValidator = new ArticleValidator(userRepository);
@@ -52,7 +58,8 @@ public class Application {
                 new EditUserUseCase(userRepository, userValidator, idValidator),
                 new DeleteUserUseCase(userRepository, idValidator),
                 new GetUserByIdUseCase(userRepository, idValidator),
-                new GetUsersUseCase(userRepository)
+                new GetUsersUseCase(userRepository),
+                exportUseCase
         );
         view.setPresenter(presenter);
 

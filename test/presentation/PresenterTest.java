@@ -2,19 +2,7 @@ package presentation;
 
 import domain.model.Article;
 import domain.model.User;
-import domain.usecase.AddArticleUseCase;
-import domain.usecase.AddUserUseCase;
-import domain.usecase.DeleteArticleUseCase;
-import domain.usecase.DeleteUserUseCase;
-import domain.usecase.EditArticleUseCase;
-import domain.usecase.EditUserUseCase;
-import domain.usecase.FilterArticlesUseCase;
-import domain.usecase.GetArticleByIdUseCase;
-import domain.usecase.GetArticlesUseCase;
-import domain.usecase.GetUserByIdUseCase;
-import domain.usecase.GetUsersUseCase;
-import domain.usecase.SearchArticleUseCase;
-import domain.usecase.SortArticlesUseCase;
+import domain.usecase.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +24,7 @@ class PresenterTest {
     private final StubEditUserUseCase editUserUseCase = new StubEditUserUseCase();
     private final StubDeleteUserUseCase deleteUserUseCase = new StubDeleteUserUseCase();
     private final StubGetUserByIdUseCase getUserByIdUseCase = new StubGetUserByIdUseCase();
+    private final ExportArticlesToExcelUseCase exportArticlesToExcelUseCase = new ExportArticlesToExcelUseCase(null, null);
 
     private Presenter presenter;
 
@@ -55,7 +44,8 @@ class PresenterTest {
                 editUserUseCase,
                 deleteUserUseCase,
                 getUserByIdUseCase,
-                new GetUsersUseCase(null)
+                new GetUsersUseCase(null),
+                exportArticlesToExcelUseCase
         );
     }
 

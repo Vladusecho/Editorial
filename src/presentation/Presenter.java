@@ -21,6 +21,7 @@ public class Presenter {
     private final EditArticleUseCase editArticleUseCase;
     private final SortArticlesUseCase sortArticlesUseCase;
     private final SearchArticleUseCase searchArticleUseCase;
+    private final ExportArticlesToExcelUseCase exportArticlesToExcelUseCase;
 
     // UseCase-ы для работы с пользователями
     private final AddUserUseCase addUserUseCase;
@@ -44,7 +45,8 @@ public class Presenter {
             EditUserUseCase editUserUseCase,
             DeleteUserUseCase deleteUserUseCase,
             GetUserByIdUseCase getUserByIdUseCase,
-            GetUsersUseCase getUsersUseCase
+            GetUsersUseCase getUsersUseCase,
+            ExportArticlesToExcelUseCase exportArticlesToExcelUseCase
 
     ) {
         this.view = view;
@@ -61,6 +63,7 @@ public class Presenter {
         this.deleteUserUseCase = deleteUserUseCase;
         this.getUserByIdUseCase = getUserByIdUseCase;
         this.getUsersUseCase = getUsersUseCase;
+        this.exportArticlesToExcelUseCase = exportArticlesToExcelUseCase;
     }
 
     // Обработка добавления статьи
@@ -184,6 +187,15 @@ public class Presenter {
         } catch (IllegalStateException e) {
             view.showError(e.getMessage());
             return List.of();
+        }
+    }
+
+    public void onExportArticles(String filePath){
+        try {
+            exportArticlesToExcelUseCase.execute(filePath);
+            view.showMessage("Articles exported successfully to " + filePath);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            view.showError(e.getMessage());
         }
     }
 

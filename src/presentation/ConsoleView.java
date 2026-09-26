@@ -27,8 +27,11 @@ public class ConsoleView implements View {
     private static final int GET_USER_BY_ID_COMMAND = 12;
     private static final int SHOW_USERS_COMMAND = 13;
     private static final int SHOW_STATS = 14;
+    private static final int EXPORT_ARTICLES_TO_EXCEL = 15;
     private static final int EXIT_COMMAND = 0;
 
+    // Внутренне хранилище статей?
+    private List<Article> articles = new ArrayList<>();
 
     // "Мозги" системы, сканер и сервис валидатора
     private Presenter presenter;
@@ -71,6 +74,7 @@ public class ConsoleView implements View {
                         showMessage("Exiting the application");
                         isRunning = false;
                     }
+                    case EXPORT_ARTICLES_TO_EXCEL -> exportArticles();
                     default -> showError("Unknown command");
                 }
             } catch (RuntimeException e) {
@@ -205,6 +209,7 @@ public class ConsoleView implements View {
         System.out.println("12. Get user by ID");
         System.out.println("13. Show all users");
         System.out.println("14. Get stats");
+        System.out.println("15. Export articles to Excel");
         System.out.println("0. Exit");
         System.out.println("-------------------------");
     }
@@ -213,6 +218,11 @@ public class ConsoleView implements View {
     @Override
     public void showArticles() {
         List<Article> showArticlesList = presenter.onGetArticles();
+
+        if (showArticlesList == null || showArticlesList.isEmpty()) {
+            showMessage("No articles found");
+            return;
+        }
 
         for (Article article : showArticlesList) {
             showArticle(article);
@@ -363,4 +373,11 @@ public class ConsoleView implements View {
         System.out.println("Articles publised: " + publishedCount);
         System.out.println("Articles rejected: " + rejectedCount);
     }
+
+    private void exportArticles(){
+        String path = getUserInput("Enter file path (e. g. articles.xlsx)").trim();
+        presenter.onExportArticles(path);
+
+    }
+
 }
