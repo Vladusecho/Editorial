@@ -341,7 +341,7 @@ public class ConsoleView implements View {
     public void showStats() {
         int userCount = presenter.onGetUsers().toArray().length;
         int articleCount = 0;
-        int moderatedCount = 0;
+        int pendingCount = 0;
         int publishedCount = 0;
         int rejectedCount = 0;
 
@@ -352,14 +352,14 @@ public class ConsoleView implements View {
         for (int i = 0; i < articleCount; i++) {
             String statusName = articleList.get(i).getStatus().name();
 
-            if (statusName.equals("MODERATING")) moderatedCount++;
+            if (statusName.equals("PENDING")) pendingCount++;
             if (statusName.equals("PUBLISHED")) publishedCount++;
             if (statusName.equals("REJECTED")) rejectedCount++;
         }
 
         System.out.println("User count: " + userCount);
         System.out.println("Article count: " + articleCount);
-        System.out.println("Articles being moderated: " + moderatedCount);
+        System.out.println("Articles awaiting moderation: " + pendingCount);
         System.out.println("Articles publised: " + publishedCount);
         System.out.println("Articles rejected: " + rejectedCount);
     }
