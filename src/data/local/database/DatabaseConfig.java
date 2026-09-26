@@ -6,18 +6,75 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class DatabaseConfig {
-    private final Properties properties = new Properties();
+    private static final String URL_PROPERTY = "db.url";
+    private static final String USER_PROPERTY = "db.user";
+    private static final String PASSWORD_PROPERTY = "db.password";
+
+    private static final String URL_ENV = "DB_URL";
+    private static final String USER_ENV = "DB_USER";
+    private static final String PASSWORD_ENV = "DB_PASSWORD";
+
+    private final String url;
+    private final String user;
+    private final String password;
 
     public DatabaseConfig(String url, String user, String password) {
-        properties.setProperty("db.url", url);
-        properties.setProperty("db.user", user);
-        properties.setProperty("db.password", password);
+        this.url = requireValue(url, URL_ENV, URL_PROPERTY);
+        this.user = requireValue(user, USER_ENV, USER_PROPERTY);
+        this.password = requireValue(password, PASSWORD_ENV, PASSWORD_PROPERTY);
     }
 
     public DatabaseConfig() {
+        Properties properties = loadProperties();
+        this.url = resolve(URL_ENV, URL_PROPERTY, properties);
+        this.user = resolve(USER_ENV, USER_PROPERTY, properties);
+        this.password = resolve(PASSWORD_ENV, PASSWORD_PROPERTY, properties);
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    private static String resolve(String envName, String propertyKey, Properties properties) {
+        String fromEnv = System.getenv(envName);
+        if (fromEnv != null && !fromEnv.isBlank()) {
+            return fromEnv;
+        }
+
+        String fromFile = properties.getProperty(propertyKey);
+        if (fromFile != null && !fromFile.isBlank()) {
+            return fromFile;
+        }
+
+        throw new IllegalStateException(
+                "No database setting: set environment variable " + envName
+                        + " or property " + propertyKey
+        );
+    }
+
+    private static String requireValue(String value, String envName, String propertyKey) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(
+                    "No database setting: set environment variable " + envName
+                            + " or property " + propertyKey
+            );
+        }
+        return value;
+    }
+
+    private static Properties loadProperties() {
+        Properties properties = new Properties();
         try (var stream = DatabaseConfig.class.getResourceAsStream("/database.properties")) {
             if (stream == null) {
-                throw new IllegalStateException("No database.properties file");
+                return properties;
             }
 
             try (var reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
@@ -26,27 +83,6 @@ public class DatabaseConfig {
         } catch (IOException e) {
             throw new IllegalStateException("Couldn't read database.properties", e);
         }
-    }
-
-    public String getUrl() {
-        return getRequired("db.url");
-    }
-
-    public String getUser() {
-        return getRequired("db.user");
-    }
-
-    public String getPassword() {
-        return getRequired("db.password");
-    }
-
-    private String getRequired(String key) {
-        String value = properties.getProperty(key);
-
-        if (value == null || value.isBlank()) {
-            throw new IllegalStateException("No parameter set in database.properties: " + key);
-        }
-
-        return value;
+        return properties;
     }
 }
