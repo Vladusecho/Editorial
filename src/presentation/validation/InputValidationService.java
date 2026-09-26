@@ -4,6 +4,7 @@ import domain.validator.ArticleValidator;
 import domain.validator.IdValidator;
 import domain.validator.UserValidator;
 
+// Сервис содеражащий в себе все валидаторы и их функции
 public class InputValidationService {
     private final IdValidator idValidator;
     private final ArticleValidator articleValidator;

@@ -13,7 +13,7 @@ public class DeleteUserUseCase {
     }
 
     public void execute(int userId) {
-        idValidator.validate(userId, "User ID");
-        userRepository.deleteUser(userId);
+        idValidator.validate(userId, "User ID"); // Валидируем
+        userRepository.deleteUser(userId); // Удаляем
     }
 }

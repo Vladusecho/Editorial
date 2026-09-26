@@ -5,6 +5,7 @@ import domain.model.User;
 
 import java.util.List;
 
+// Интерфейс для ConsoleView
 public interface View {
     void showStartOptions();
 

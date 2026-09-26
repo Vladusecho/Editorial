@@ -2,6 +2,7 @@ package domain.repository;
 
 import domain.model.User;
 
+// Интерфейс для пользователей
 import java.util.List;
 
 public interface UserRepository {

@@ -14,7 +14,7 @@ public class AddUserUseCase {
     }
 
     public void execute(User user) {
-        userValidator.validate(user);
-        userRepository.addUser(user);
+        userValidator.validate(user); // Валидируем
+        userRepository.addUser(user); // Добавляем
     }
 }

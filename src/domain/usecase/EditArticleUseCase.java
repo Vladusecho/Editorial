@@ -21,15 +21,16 @@ public class EditArticleUseCase {
     }
 
     public void execute(int articleId, String title, String content, Article.Status status) {
-        idValidator.validate(articleId, "Article ID");
+        idValidator.validate(articleId, "Article ID"); // Валидируем id
 
-        Article article = articleRepository.getArticleById(articleId);
+        Article article = articleRepository.getArticleById(articleId); // получаем статью
 
+        // Изменяем статью
         article.setTitle(title);
         article.setContent(content);
         article.setStatus(status);
 
-        articleValidator.validate(article);
-        articleRepository.editArticle(article);
+        articleValidator.validate(article); // Валидируем статью
+        articleRepository.editArticle(article); // Редактируем в БД
     }
 }

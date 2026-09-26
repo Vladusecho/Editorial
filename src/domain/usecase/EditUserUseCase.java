@@ -27,16 +27,17 @@ public class EditUserUseCase {
             String passwordHash,
             User.Role role
     ) {
-        idValidator.validate(userId, "User ID");
+        idValidator.validate(userId, "User ID"); // Валидируем id
 
-        User user = userRepository.getUserById(userId);
+        User user = userRepository.getUserById(userId); // Получаем пользователя по id
 
+        // Редактируем пользователя
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash(passwordHash);
         user.setRole(role);
 
-        userValidator.validate(user);
-        userRepository.editUser(user);
+        userValidator.validate(user); // Валидируем
+        userRepository.editUser(user); // Изменяем в БД
     }
 }
