@@ -1,48 +1,24 @@
-name: Deploy
+name: Pipeline
 
 on:
+  push:
+    branches: ["**"]
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
-  checks: read
 
 jobs:
-  deploy:
+  # =========================================================================
+  # 1. ТЕСТЫ (Запускаются всегда первыми)
+  # =========================================================================
+  test:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
-    environment: production
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # =========================================================================
-      # 1. ПРОВЕРКА: Прошли ли тесты для этого коммита ранее?
-      # =========================================================================
-      - name: Verify that CI tests passed
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Проверяем статус проверок для коммита ${{ github.sha }}..."
-
-          # Ищем результат проверки джобы с именем "test"
-          CONCLUSION=$(gh api repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs \
-            --jq '.check_runs[] | select(.name == "test") | .conclusion' | head -n 1)
-
-          echo "Статус завершения тестов: '$CONCLUSION'"
-
-          if [ "$CONCLUSION" != "success" ]; then
-            echo "❌ ОШИБКА: Тесты для этого коммита НЕ пройдены!"
-            echo "Текущий статус: ${CONCLUSION:-'тесты еще не запускались или еще идут'}"
-            echo "Деплой остановлен. Дождитесь зеленой галочки в CI."
-            exit 1
-          fi
-
-          echo "✅ Тесты успешно пройдены ранее! Переходим к сборке и деплою..."
-
-      # =========================================================================
-      # 2. СБОРКА ПРОЕКТА
-      # =========================================================================
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -50,13 +26,33 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build JAR with Maven
-        run: mvn -B package -DskipTests
+      - name: Run tests
+        run: mvn -B test
 
-      # =========================================================================
-      # 3. ПОДГОТОВКА И ПУШ DOCKER-ОБРАЗА
-      # =========================================================================
-      # Формируем корректное имя образа в нижнем регистре: ghcr.io/owner/editorial-prod:latest
+  # =========================================================================
+  # 2. ДЕПЛОЙ (Соединен с тестами, ждет кнопку подтверждения)
+  # =========================================================================
+  deploy:
+    name: Deploy to Server
+    needs: test
+    environment: production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build JAR and Dependencies
+        run: mvn -B package dependency:copy-dependencies -DoutputDirectory=target/dependency -DincludeScope=runtime -DskipTests
+
       - name: Prepare Docker Image Name
         run: |
           IMAGE_LOWER=$(echo "ghcr.io/${{ github.repository_owner }}/editorial-prod:latest" | tr '[:upper:]' '[:lower:]')
@@ -76,9 +72,6 @@ jobs:
           push: true
           tags: ${{ env.IMAGE }}
 
-      # =========================================================================
-      # 4. ДЕПЛОЙ НА СЕРВЕР ПО SSH
-      # =========================================================================
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
@@ -90,22 +83,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: IMAGE
           script: |
-            # Логинимся в реестр GitHub на самом сервере
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            # Скачиваем обновленный образ
             docker pull $IMAGE
-
-            # Останавливаем старый контейнер, если он существует
-            docker stop my-app || true
-            docker rm my-app || true
-
-            # Запускаем новый контейнер
+            docker stop editorial-app || true
+            docker rm editorial-app || true
             docker run -d \
-              --name my-app \
+              --name editorial-app \
               --restart unless-stopped \
               -p 6767:6767 \
               $IMAGE
-
-            # Очищаем старые ненужные слои
             docker image prune -f
