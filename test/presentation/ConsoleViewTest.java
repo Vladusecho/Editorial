@@ -56,7 +56,7 @@ class ConsoleViewTest {
         assertAll(
                 () -> assertTrue(result.contains("User count: 2")),
                 () -> assertTrue(result.contains("Article count: 4")),
-                () -> assertTrue(result.contains("Articles being moderated: 1")),
+                () -> assertTrue(result.contains("Articles awaiting moderation: 1")),
                 () -> assertTrue(result.contains("Articles publised: 1")),
                 () -> assertTrue(result.contains("Articles rejected: 1"))
         );
