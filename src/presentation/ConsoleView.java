@@ -26,6 +26,7 @@ public class ConsoleView implements View {
     private static final int DELETE_USER_COMMAND = 11;
     private static final int GET_USER_BY_ID_COMMAND = 12;
     private static final int SHOW_USERS_COMMAND = 13;
+    private static final int EXPORT_ARTICLES_TO_EXCEL = 14;
     private static final int EXIT_COMMAND = 0;
 
     // Внутренне хранилище статей?
@@ -71,6 +72,7 @@ public class ConsoleView implements View {
                         showMessage("Exiting the application");
                         isRunning = false;
                     }
+                    case EXPORT_ARTICLES_TO_EXCEL -> exportArticles();
                     default -> showError("Unknown command");
                 }
             } catch (RuntimeException e) {
@@ -206,6 +208,7 @@ public class ConsoleView implements View {
         System.out.println("11. Delete user");
         System.out.println("12. Get user by ID");
         System.out.println("13. Show all users");
+        System.out.println("14. Export articles to Excel");
         System.out.println("0. Exit");
         System.out.println("-------------------------");
     }
@@ -214,6 +217,11 @@ public class ConsoleView implements View {
     @Override
     public void showArticles() {
         List<Article> showArticlesList = presenter.onGetArticles();
+
+        if (showArticlesList == null || showArticlesList.isEmpty()) {
+            showMessage("No articles found");
+            return;
+        }
 
         for (Article article : showArticlesList) {
             showArticle(article);
@@ -336,6 +344,12 @@ public class ConsoleView implements View {
                 showError("Value out of bounds");
             }
         }
+    }
+
+    private void exportArticles(){
+        String path = getUserInput("Enter file path (e. g. articles.xlsx)").trim();
+        presenter.onExportArticles(path);
+
     }
 
 }
