@@ -53,7 +53,7 @@ public class UserValidator {
     // Метод валидации hash-пароля пользователя (!null)
     public void validatePasswordHash(String passwordHash) {
         if (isBlank(passwordHash)) {
-            throw new IllegalArgumentException("Password hash cannot be empty");
+            throw new IllegalArgumentException("Password cannot be empty");
         }
     }
 
